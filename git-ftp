@@ -288,9 +288,11 @@ get_keychain_password () {
 		[ -n "$KEYCHAIN_HOST" ] && KEYCHAIN_ARGS+=(-s "$KEYCHAIN_HOST")
 
 		write_log "Read password from keychain."
+		
+		KEYCHAIN_HOST=$( echo "$KEYCHAIN_HOST" | cut -d":" -f1 )
 
 		local pass
-		if pass="$(security find-internet-password "${KEYCHAIN_ARGS[@]}" -g 2>&1 > /dev/null)"; then
+		if pass="$(security find-internet-password -a "${KEYCHAIN_USER}" -s ${KEYCHAIN_HOST} -g 2>&1 > /dev/null)"; then
 			without_prefix="${pass#password: \"}"
 			REMOTE_PASSWD="${without_prefix%\"}"
 		else
